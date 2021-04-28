@@ -1,8 +1,8 @@
-package studio.craftory.runtimePatcher.agent;
+package studio.craftory.runtimepatcher.agent;
 
 import java.util.regex.Pattern;
-import studio.craftory.runtimePatcher.annotation.*;
-import studio.craftory.runtimePatcher.util.MethodUtils;
+import studio.craftory.runtimepatcher.annotation.*;
+import studio.craftory.runtimepatcher.util.MethodUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
@@ -14,13 +14,11 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.*;
 
-/**
- * Created by Yamakaja on 19.05.17.
- */
+
 public class AgentJob {
 
     private final List<MethodJob> methodJobs;
-    private Class<?> transformer;
+    private Class<?> patcher;
     private Class<?> toTransform;
     private Class<?>[] interfaces;
     private static String VERSION;
@@ -28,26 +26,26 @@ public class AgentJob {
     private Map<String, SpecialInvocation> specialInvocations = new HashMap<>();
 
 
-    public AgentJob(Class<?> transformer, String version) {
-        this.transformer = transformer;
-        this.interfaces = transformer.getInterfaces();
+    public AgentJob(Class<?> patcher, String version) {
+        this.patcher = patcher;
+        this.interfaces = patcher.getInterfaces();
         this.VERSION = version;
 
-        this.readTransformationTarget(transformer);
+        this.readTransformationTarget(patcher);
 
-        ClassNode transformerNode = new ClassNode(Opcodes.ASM9);
-        ClassReader transformerReader;
+        ClassNode patcherNode = new ClassNode(Opcodes.ASM9);
+        ClassReader patcherReader;
 
         try {
-            transformerReader = new ClassReader(transformer.getResource(transformer.getSimpleName() + ".class").openStream());
+            patcherReader = new ClassReader(patcher.getResource(patcher.getSimpleName() + ".class").openStream());
         } catch (IOException e) {
             throw new RuntimeException("Failed to load class file of " + this.toTransform.getSimpleName(), e);
         }
 
-        transformerReader.accept(transformerNode, 0);
-        Map<String, ClassNode> innerClasses = readInnerClasses(transformerNode);
+        patcherReader.accept(patcherNode, 0);
+        Map<String, ClassNode> innerClasses = readInnerClasses(patcherNode);
 
-        Method[] methods = transformer.getDeclaredMethods();
+        Method[] methods = patcher.getDeclaredMethods();
 
         this.findSpecialInvocations(methods);
 
@@ -58,18 +56,18 @@ public class AgentJob {
 
                     InjectionType type = method.getAnnotation(Inject.class).value();
 
-                    Optional<MethodNode> transformerMethodNode = ((List<MethodNode>) transformerNode.methods).stream()
+                    Optional<MethodNode> patcherMethodNode = ((List<MethodNode>) patcherNode.methods).stream()
                             .filter(node -> node != null && method.getName().equals(node.name) && MethodUtils.getSignature(method).equals(node.desc))
                             .findAny();
 
-                    if (!transformerMethodNode.isPresent())
-                        throw new RuntimeException("Transformer method node not found! (WTF?)");
+                    if (!patcherMethodNode.isPresent())
+                        throw new RuntimeException("Patcher method node not found! (WTF?)");
 
                     this.methodJobs.add(new MethodJob(type, this.toTransform.getName().replace('.', '/'),
                             this.toTransform,
-                            transformer.getName().replace('.', '/'),
+                            patcher.getName().replace('.', '/'),
                             this.toTransform.getSuperclass().getName().replace('.', '/'),
-                            transformerMethodNode.get(), this.specialInvocations, innerClasses));
+                            patcherMethodNode.get(), this.specialInvocations, innerClasses));
 
                 });
     }
@@ -82,7 +80,7 @@ public class AgentJob {
                 .map(node -> {
                     ClassNode innerClassNode = new ClassNode(Opcodes.ASM9);
 
-                    try (InputStream inputStream = this.transformer.getResourceAsStream(node.name.substring(node.name.lastIndexOf('/') + 1) + ".class")) {
+                    try (InputStream inputStream = this.patcher.getResourceAsStream(node.name.substring(node.name.lastIndexOf('/') + 1) + ".class")) {
                         ClassReader reader = new ClassReader(inputStream);
 
                         reader.accept(innerClassNode, 0);
@@ -102,20 +100,20 @@ public class AgentJob {
                         new SpecialInvocation(method)));
     }
 
-    private void readTransformationTarget(Class<?> transformer) {
+    private void readTransformationTarget(Class<?> patcher) {
         String targetClassName;
-        if (transformer.isAnnotationPresent(Transform.class)) {
-            targetClassName = transformer.getAnnotation(Transform.class).value().getName();
-        } else if (transformer.isAnnotationPresent(TransformByName.class)) {
-            targetClassName = transformer.getAnnotation(TransformByName.class).value();
+        if (patcher.isAnnotationPresent(Patch.class)) {
+            targetClassName = patcher.getAnnotation(Patch.class).value().getName();
+        } else if (patcher.isAnnotationPresent(PatchByName.class)) {
+            targetClassName = patcher.getAnnotation(PatchByName.class).value();
         } else {
-            throw new RuntimeException("No transformation annotation present on transformer: " + transformer.getName());
+            throw new RuntimeException("No transformation annotation present on patcher: " + patcher.getName());
         }
 
         targetClassName = convertVersion(targetClassName);
 
         try {
-            this.toTransform = Class.forName(targetClassName, true, transformer.getClassLoader());
+            this.toTransform = Class.forName(targetClassName, true, patcher.getClassLoader());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to transform class: ", e);
         }
@@ -125,7 +123,7 @@ public class AgentJob {
     private String convertVersion(String targetClassName) {
         targetClassName = targetClassName.replace("{version}", VERSION);
 
-        String[] packages = targetClassName.split(".");
+        String[] packages = targetClassName.split("\\.");
         return targetClassName.replace(packages[3], VERSION);
     }
 
@@ -141,8 +139,8 @@ public class AgentJob {
         return interfaces;
     }
 
-    public Class<?> getTransformer() {
-        return transformer;
+    public Class<?> getPatcher() {
+        return patcher;
     }
 
     public void apply(ClassNode node) {

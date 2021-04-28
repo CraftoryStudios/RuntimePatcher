@@ -1,8 +1,6 @@
-package studio.craftory.runtimePatcher.annotation;
+package studio.craftory.runtimepatcher.annotation;
 
-/**
- * Created by Yamakaja on 19.05.17.
- */
+
 public enum InjectionType {
     /**
      * Insert code at the beginning of the method

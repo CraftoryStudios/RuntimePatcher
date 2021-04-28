@@ -1,4 +1,4 @@
-package studio.craftory.runtimePatcher;
+package studio.craftory.runtimepatcher;
 
 import java.io.File;
 import java.io.IOException;

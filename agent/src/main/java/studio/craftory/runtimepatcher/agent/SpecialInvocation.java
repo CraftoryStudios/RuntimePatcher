@@ -1,12 +1,10 @@
-package studio.craftory.runtimePatcher.agent;
+package studio.craftory.runtimepatcher.agent;
 
-import studio.craftory.runtimePatcher.annotation.CallParameters;
+import studio.craftory.runtimepatcher.annotation.CallParameters;
 
 import java.lang.reflect.Method;
 
-/**
- * Created by Yamakaja on 3/5/18.
- */
+
 public class SpecialInvocation {
 
     private Method method;

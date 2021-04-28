@@ -1,15 +1,12 @@
-package studio.craftory.runtimePatcher.agent;
+package studio.craftory.runtimepatcher.agent;
 
-import studio.craftory.runtimePatcher.transform.ClassTransformer;
+import studio.craftory.runtimepatcher.transform.ClassPatcher;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Yamakaja on 19.05.17.
- */
 public class Agent {
 
     private static Agent instance;
@@ -28,17 +25,17 @@ public class Agent {
         return instance;
     }
 
-    public void process(String version, Class<?>... transformerClasses) {
+    public void process(String version, Class<?>... patcherClasses) {
         List<AgentJob> agentJobs = new ArrayList<>();
 
-        for (Class<?> clazz : transformerClasses)
+        for (Class<?> clazz : patcherClasses)
             agentJobs.add(new AgentJob(clazz, version));
 
-        ClassTransformer classTransformer = new ClassTransformer(agentJobs);
-        instrumentation.addTransformer(classTransformer, true);
+        ClassPatcher classPatcher = new ClassPatcher(agentJobs);
+        instrumentation.addTransformer(classPatcher, true);
 
         try {
-            instrumentation.retransformClasses(classTransformer.getClassesToTransform());
+            instrumentation.retransformClasses(classPatcher.getClassesToTransform());
         } catch (UnmodifiableClassException e) {
             e.printStackTrace();
         }

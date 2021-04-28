@@ -1,10 +1,8 @@
-package studio.craftory.runtimePatcher.transform;
+package studio.craftory.runtimepatcher.transform;
 
 import org.objectweb.asm.ClassWriter;
 
-/**
- * Created by Yamakaja on 3/5/18.
- */
+
 public class FixedClassWriter extends ClassWriter {
 
     private ClassLoader loader;

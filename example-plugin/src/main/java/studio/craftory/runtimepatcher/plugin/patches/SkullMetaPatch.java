@@ -12,15 +12,15 @@ import net.minecraft.server.v1_16_R3.TileEntitySkull;
 import studio.craftory.runtimepatcher.annotation.PatchByName;
 
 @PatchByName("org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaSkull")
-public class SkullMetaPatcher {
+public class SkullMetaPatch {
 
     private GameProfile profile;
 
     @CallParameters(
             type = CallParameters.Type.SPECIAL,
-            owner = "org/bukkit/craftbukkit/v1_15_R1/inventory/CraftMetaItem",
+            owner = "org/bukkit/craftbukkit/v1_16_R3/inventory/CraftMetaItem",
             name = "applyToItem",
-            desc = "(Lnet/minecraft/server/v1_15_R1/NBTTagCompound;)V"
+            desc = "(Lnet/minecraft/server/v1_16_R3/NBTTagCompound;)V"
     )
     private native void super_applyToItem(NBTTagCompound tag);
 

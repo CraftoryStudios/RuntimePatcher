@@ -1,8 +1,8 @@
-package studio.craftory.runtimePatcher.plugin;
+package studio.craftory.runtimepatcher.plugin;
 
-import studio.craftory.runtimePatcher.RuntimePatcher;
-import studio.craftory.runtimePatcher.plugin.transformer.EntityLivingTransformer;
-import studio.craftory.runtimePatcher.plugin.transformer.SkullMetaTransformer;
+import studio.craftory.runtimepatcher.RuntimePatcher;
+import studio.craftory.runtimepatcher.plugin.patches.EntityLivingPatch;
+import studio.craftory.runtimepatcher.plugin.patches.SkullMetaPatch;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,17 +11,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Created by Yamakaja on 19.05.17.
- */
+
 public class ExampleTransformationPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
 
         new RuntimePatcher(
-                EntityLivingTransformer.class,
-                SkullMetaTransformer.class
+            EntityLivingPatch.class,
+                SkullMetaPatch.class
         );
 
     }

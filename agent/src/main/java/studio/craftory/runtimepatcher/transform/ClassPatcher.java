@@ -12,9 +12,7 @@ import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
-/**
- * Created by Yamakaja on 18.05.17.
- */
+
 public class ClassPatcher implements ClassFileTransformer {
 
     private List<AgentJob> agentJobs;

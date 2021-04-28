@@ -1,46 +1,43 @@
-package studio.craftory.runtimePatcher.agent;
+package studio.craftory.runtimepatcher.agent;
 
-import studio.craftory.runtimePatcher.annotation.CallParameters;
-import studio.craftory.runtimePatcher.annotation.InjectionType;
+import studio.craftory.runtimepatcher.annotation.CallParameters;
+import studio.craftory.runtimepatcher.annotation.InjectionType;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by Yamakaja on 19.05.17.
- */
 public class MethodJob {
 
     private InjectionType type;
-    private MethodNode transformerNode;
+    private MethodNode patcherNode;
     private MethodNode resultNode;
 
     private String transformationTarget;
     private Class<?> transformationTargetClass;
-    private String transformer;
+    private String patcher;
     private String superClass;
 
     private Map<String, SpecialInvocation> specialInvocations;
     private Map<String, ClassNode> innerClasses;
 
-    public MethodJob(InjectionType type, String transformationTarget, Class<?> transformationTargetClass, String transformer, String superClass, MethodNode transformerNode,
+    public MethodJob(InjectionType type, String transformationTarget, Class<?> transformationTargetClass, String patcher, String superClass, MethodNode patcherNode,
                      Map<String, SpecialInvocation> specialInvocations, Map<String, ClassNode> innerClasses) {
         this.type = type;
-        this.transformerNode = transformerNode;
+        this.patcherNode = patcherNode;
         this.transformationTarget = transformationTarget;
         this.transformationTargetClass = transformationTargetClass;
-        this.transformer = transformer;
+        this.patcher = patcher;
         this.superClass = superClass;
         this.specialInvocations = specialInvocations;
         this.innerClasses = innerClasses;
 
-        transformerNode.name = transformerNode.name.endsWith("_INJECTED")
-                ? transformerNode.name.substring(0, transformerNode.name.length() - 9)
-                : transformerNode.name;
+        patcherNode.name = patcherNode.name.endsWith("_INJECTED")
+                ? patcherNode.name.substring(0, patcherNode.name.length() - 9)
+                : patcherNode.name;
 
-        transformerNode.name = transformerNode.name.equals("_init_") ? "<init>" : transformerNode.name;
+        patcherNode.name = patcherNode.name.equals("_init_") ? "<init>" : patcherNode.name;
     }
 
     public void process() {
@@ -68,7 +65,7 @@ public class MethodJob {
             if (insn instanceof MethodInsnNode) {
                 MethodInsnNode methodInsn = (MethodInsnNode) insn;
 
-                if (methodInsn.getOpcode() == Opcodes.INVOKESPECIAL && waitingForInit && methodInsn.owner.startsWith(transformer)) {
+                if (methodInsn.getOpcode() == Opcodes.INVOKESPECIAL && waitingForInit && methodInsn.owner.startsWith(patcher)) {
                     methodInsn.owner = replacementClassName;
                     waitingForInit = false;
                 }
@@ -88,11 +85,11 @@ public class MethodJob {
 
                 if (methodInsn.getOpcode() == Opcodes.INVOKESPECIAL && methodInsn.owner.equals(this.transformationTarget))
                     methodInsn.owner = this.superClass;
-                else if (methodInsn.owner.equals(transformer))
+                else if (methodInsn.owner.equals(patcher))
                     methodInsn.owner = this.transformationTarget;
 
                 if (methodInsn.getOpcode() == Opcodes.INVOKESPECIAL)
-                    methodInsn.desc = methodInsn.desc.replace("L" + this.transformer + ";", "L" + this.transformationTarget + ";");
+                    methodInsn.desc = methodInsn.desc.replace("L" + this.patcher + ";", "L" + this.transformationTarget + ";");
 
                 if (methodInsn.name.endsWith("_INJECTED"))
                     methodInsn.name = methodInsn.name.substring(0, methodInsn.name.length() - 9);
@@ -112,7 +109,7 @@ public class MethodJob {
             if (insn instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsn = (FieldInsnNode) insn;
 
-                if (fieldInsn.owner.equals(transformer))
+                if (fieldInsn.owner.equals(patcher))
                     fieldInsn.owner = this.transformationTarget;
             }
 
@@ -136,13 +133,13 @@ public class MethodJob {
 
         list.remove(node);
 
-        list.add(transformerNode.instructions);
+        list.add(patcherNode.instructions);
 
-        resultNode.instructions.add(transformerNode.instructions);
+        resultNode.instructions.add(patcherNode.instructions);
     }
 
     private void insert() {
-        InsnList trInsns = transformerNode.instructions;
+        InsnList trInsns = patcherNode.instructions;
 
         AbstractInsnNode node = trInsns.getLast();
 
@@ -168,7 +165,7 @@ public class MethodJob {
     }
 
     private void override() {
-        resultNode = transformerNode;
+        resultNode = patcherNode;
     }
 
     public MethodNode getResultNode() {
@@ -177,8 +174,8 @@ public class MethodJob {
 
     public void apply(ClassNode node) {
         for (int i = 0; i < node.methods.size(); i++) {
-            if (!(transformerNode.name.equals(((MethodNode) node.methods.get(i)).name)
-                    && transformerNode.desc.equals(((MethodNode) node.methods.get(i)).desc)))
+            if (!(patcherNode.name.equals(((MethodNode) node.methods.get(i)).name)
+                    && patcherNode.desc.equals(((MethodNode) node.methods.get(i)).desc)))
                 continue;
 
             resultNode = ((MethodNode) node.methods.get(i));
@@ -189,6 +186,6 @@ public class MethodJob {
             return;
         }
 
-        throw new RuntimeException("Target method node not found! Transformer: " + transformer);
+        throw new RuntimeException("Target method node not found! Patcher: " + patcher);
     }
 }

@@ -1,11 +1,9 @@
-package studio.craftory.runtimePatcher.util;
+package studio.craftory.runtimepatcher.util;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-/**
- * Created by Yamakaja on 19.05.17.
- */
+
 public class MethodUtils {
 
     private MethodUtils() {

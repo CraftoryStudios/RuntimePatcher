@@ -1,4 +1,4 @@
-package studio.craftory.runtimePatcher.annotation;
+package studio.craftory.runtimepatcher.annotation;
 
 import org.objectweb.asm.Opcodes;
 
@@ -6,12 +6,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import static studio.craftory.runtimepatcher.annotation.CallParameters.Type.VIRTUAL;
 
-import static studio.craftory.runtimePatcher.annotation.CallParameters.Type.VIRTUAL;
 
-/**
- * Created by Yamakaja on 3/5/18.
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface CallParameters {
