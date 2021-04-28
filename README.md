@@ -1,4 +1,4 @@
-# RuntimeTransformer
+# RuntimePatcher
 
 A tool allowing for easy class modification at runtime, when using a normal javaagent at startup would be too inconvenient.
 Note, this method comes with disadvantages, for example method modifiers may not be altered, new methods can not be created and neither can class inheritance be changed.
@@ -23,11 +23,11 @@ public void setHealth(float newHealth) {
 }
 ```
  
-To get there, we first need to define a transformer, this should optimally be in its own class and look something like this:
+To get there, we first need to define a patcher, this should optimally be in its own class and look something like this:
 
 ```java
 @Transform(EntityLiving.class) // The class we want to transform
-public class EntityLivingTransformer extends EntityLiving { // Extending EntityLiving in our transformer makes things easier, but isn't required (Which, for example, allows you to transform final classes)
+public class EntityLivingPatcher extends EntityLiving { // Extending EntityLiving in our patcher makes things easier, but isn't required (Which, for example, allows you to transform final classes)
     
     @Inject(InjectionType.INSERT) // Our goal is to insert code at the beginning of the method, and leave everything else intact
     public void setHealth(float newHealth) { // Then just "override" the method as usual, if it is final add an _INJECTED to the method name
@@ -45,14 +45,14 @@ public class EntityLivingTransformer extends EntityLiving { // Extending EntityL
 } 
 ```
 
-And that's pretty much it, now we just need to create our runtime transformer:
+And that's pretty much it, now we just need to create our runtime patcher:
 
 ```java
-new RuntimeTransformer( EntityLivingTransformer.class );
+new RuntimePatcher( EntityLivingPatcher.class );
 ```
 
 For Java 9+ runtimes, you have to allow self attaching by adding this startup `-Djdk.attach.allowAttachSelf=true`
-parameter or creating the `RuntimeTransformer` instance in a separate process.
+parameter or creating the `RuntimePatcher` instance in a separate process.
 
 And we're done.
 
@@ -80,12 +80,14 @@ To install the api jar into your local maven repo run
 `./gradlew publishToMavenLocal`
 
 The correct artifact can then be included using the following dependency definition:
+
 ```xml
-        <dependency>
-            <groupId>me.yamakaja.runtimetransformer</groupId>
-            <artifactId>api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+
+<dependency>
+  <groupId>studio.craftory.runtimePatcher</groupId>
+  <artifactId>api</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</dependency>
 ```
 
 Don't forget to actually include the artifact in your final jar, using the `maven-shade-plugin` or an equivalent alternative!

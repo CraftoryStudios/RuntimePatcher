@@ -1,5 +1,6 @@
 dependencies {
-    compile "org.ow2.asm:asm-all:5.2"
+    compile "org.ow2.asm:asm:9.0"
+    compile "org.ow2.asm:asm-tree:9.0"
 }
 
 jar {
@@ -11,7 +12,7 @@ jar {
 
     manifest {
         attributes(
-                "Agent-Class": "me.yamakaja.runtimetransformer.agent.Agent",
+                "Agent-Class": "studio.craftory.runtimepatcher.agent.Agent",
                 "Can-Retransform-Classes": "true",
                 "Can-Redefine-Classes": "true"
         )
@@ -23,7 +24,7 @@ apply plugin: 'maven-publish'
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId 'me.yamakaja.runtimetransformer'
+            groupId 'studio.craftory.runtimePatcher'
             artifactId 'agent'
             version  project.getParent().getVersion()
 

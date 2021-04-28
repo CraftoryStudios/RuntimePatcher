@@ -1,6 +1,6 @@
-name: RuntimeTransformer
-main: me.yamakaja.runtimetransformer.plugin.ExampleTransformationPlugin
-author: Yamakaja
+name: RuntimePatcher
+main: studio.craftory.runtimepatcher.plugin.ExampleTransformationPlugin
+author: BrettSaunders
 version: 0.0.1
 commands:
   debugtest: {}

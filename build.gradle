@@ -1,11 +1,12 @@
-group 'me.yamakaja.runtimetransformer'
-version '1.0-SNAPSHOT'
+group 'studio.craftory.runtimePatcher'
+version '1.0.0'
 
 apply plugin: 'base'
 
 subprojects {
     apply plugin: 'java'
-    sourceCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 
     repositories {
         mavenCentral()
@@ -17,9 +18,9 @@ subprojects {
 task installPlugin(type: Copy) {
     from("$rootDir/example-plugin/build/libs/example-plugin.jar")
     into "$rootDir/testenv/plugins"
-    rename { "RuntimeTransformer.jar" }
+    rename { "RuntimePatcher.jar" }
 }
 
 clean.doFirst {
-    delete("$rootDir/testenv/plugins/RuntimeTransformer.jar")
+    delete("$rootDir/testenv/plugins/RuntimePatcher.jar")
 }
