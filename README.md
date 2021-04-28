@@ -1,5 +1,9 @@
 # RuntimePatcher
 
+## Credit
+This project is built off a previous project found here: https://github.com/games647/RuntimeTransformer
+
+## Overview
 A tool allowing for easy class modification at runtime, when using a normal javaagent at startup would be too inconvenient.
 Note, this method comes with disadvantages, for example method modifiers may not be altered, new methods can not be created and neither can class inheritance be changed.
 
