@@ -6,7 +6,7 @@ dependencies {
 
 jar {
     from {
-        configurations.compileOnly.collect {
+        configurations.compileJava.collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
