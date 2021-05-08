@@ -69,7 +69,7 @@ There are three types of Injection:
 Run this command to build the api project.
 `./gradlew jar`
 
-## Installation
+## Installation - Local Maven
 
 To install the api jar into your local maven repo run
 `./gradlew publishToMavenLocal`
@@ -87,3 +87,6 @@ The correct artifact can then be included using the following dependency definit
 
 Don't forget to actually include the artifact in your final jar, using the `maven-shade-plugin` or an equivalent alternative!
 
+## Installation
+
+The best way to use this package is by using the Github packages that are generated every release
