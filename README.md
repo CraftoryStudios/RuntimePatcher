@@ -3,6 +3,10 @@
 A tool allowing for easy class modification at runtime, when using a normal javaagent at startup would be too inconvenient.
 Note, this method comes with disadvantages, for example method modifiers may not be altered, new methods can not be created and neither can class inheritance be changed.
 
+## Credit
+This project is based of [RuntimeTransformer](https://github.com/Yamakaja/RuntimeTransformer) made by [Yamakaja](https://github.com/Yamakaja), [games647](https://github.com/games647) and 
+[MiniDigger](https://github.com/MiniDigger). All credit for the original idea and code goes to them, I am just responsible for updating and adding my own additions to this project.
+
 ## Usage
 
 Let's assume we want to inject an event handler into the `setHealth` method of `EntityLiving`,
